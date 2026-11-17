@@ -1,0 +1,33 @@
+﻿@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-qool-orange: #FF5A36;
+  --color-qool-background: #F5F3EE;
+  --color-qool-peach: #FFE4DB;
+  --color-qool-beige: #E8E1D8;
+  --color-qool-text: #171717;
+  --color-qool-muted: #99938D;
+}
+
+:root {
+  font-family: "Inter", sans-serif;
+  color: #171717;
+  background: #F5F3EE;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.font-arabic {
+  font-family: "Alexandria", sans-serif;
+}
