@@ -1,4 +1,5 @@
-﻿import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import WorkflowProvider from "./state/WorkflowProvider";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import AddText from "./pages/AddText";
@@ -8,15 +9,16 @@ import VideoReady from "./pages/VideoReady";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <WorkflowProvider><BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/add-text" element={<AddText />} />
         <Route path="/voice" element={<Voice />} />
         <Route path="/generate" element={<Generate />} />
+        <Route path="/prompt-ready" element={<VideoReady />} />
         <Route path="/video-ready" element={<VideoReady />} />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></WorkflowProvider>
   );
 }

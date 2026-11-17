@@ -1,6 +1,8 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ImagePlus, ArrowRight } from "lucide-react";
+import { useWorkflow } from "../state/workflow";
+import StepIndicator from "../components/StepIndicator";
 import Header from "../components/Header";
 
 const examples = [
@@ -13,14 +15,15 @@ const examples = [
 export default function Upload() {
   const navigate = useNavigate();
   const fileInput = useRef<HTMLInputElement>(null);
-  const [image, setImage] = useState<string | null>(
-    sessionStorage.getItem("qool-example-image")
-  );
+  const selection = useRef(0);
+  const { data, update } = useWorkflow();
+  const image = data.portrait;
   const [error, setError] = useState("");
   const [dragging, setDragging] = useState(false);
 
   function handleFile(file?: File) {
     if (!file) return;
+    const request = ++selection.current;
 
     if (!["image/jpeg", "image/png"].includes(file.type)) {
       setError("Please upload a JPG or PNG image.");
@@ -32,15 +35,25 @@ export default function Upload() {
       return;
     }
 
-    const url = URL.createObjectURL(file);
-    setImage(url);
-    sessionStorage.removeItem("qool-example-image");
-    setError("");
+    const reader = new FileReader();
+    reader.onerror = () => setError("Could not read this image. Please try another file.");
+    reader.onload = () => {
+      const source = String(reader.result);
+      const decoded = new window.Image();
+      decoded.onerror = () => setError("This file is not a readable JPG or PNG image.");
+      decoded.onload = () => {
+        if (request !== selection.current) return;
+        update({ portrait: source, portraitName: file.name });
+        setError("");
+      };
+      decoded.src = source;
+    };
+    reader.readAsDataURL(file);
   }
 
   function chooseExample(src: string) {
-    setImage(src);
-    sessionStorage.setItem("qool-example-image", src);
+    selection.current += 1;
+    update({ portrait: src, portraitName: examples.find(example => example.src === src)?.name || 'Example portrait' });
     setError("");
   }
 
@@ -59,22 +72,7 @@ export default function Upload() {
             <ArrowLeft size={24} />
           </button>
 
-          <div className="flex flex-wrap justify-center gap-5 text-sm font-medium md:gap-10">
-            {["Upload", "Add text", "Voice", "Generate"].map((step, index) => (
-              <div key={step} className="flex items-center gap-2">
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                    index === 0
-                      ? "bg-qool-orange text-white"
-                      : "bg-[#E8E5DF] text-[#777]"
-                  }`}
-                >
-                  {index + 1}
-                </span>
-                <span className="hidden sm:inline">{step}</span>
-              </div>
-            ))}
-          </div>
+          <StepIndicator current={1} />
         </div>
 
         <section className="mt-14">
@@ -143,7 +141,7 @@ export default function Upload() {
           </div>
 
           {error && (
-            <p className="mt-3 text-center text-sm text-red-600">{error}</p>
+            <p role="alert" className="mt-3 text-center text-sm text-red-600">{error}</p>
           )}
         </section>
 

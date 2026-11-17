@@ -1,25 +1,21 @@
-﻿import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, FileAudio, Type } from "lucide-react";
+import { useWorkflow } from "../state/workflow";
+import StepIndicator from "../components/StepIndicator";
 import Header from "../components/Header";
 
 export default function AddText() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"text" | "audio">("text");
-  const [text, setText] = useState(
-    sessionStorage.getItem("qool-text") || ""
-  );
-  const [audio, setAudio] = useState<File | null>(null);
-
+  const { data, update } = useWorkflow();
+  const text = data.dialogue;
+  const audio = data.audio;
+  const [error, setError] = useState("");
+  if (!data.portrait) return <Navigate to="/upload" replace />;
   function next() {
-    if (mode === "text") {
-      sessionStorage.setItem("qool-text", text);
-      sessionStorage.setItem("qool-input-mode", "text");
-      navigate("/voice");
-    } else if (audio) {
-      sessionStorage.setItem("qool-input-mode", "audio");
-      navigate("/voice");
-    }
+    if (text.trim()) navigate("/voice");
+    else { setMode("text"); setError("Enter the exact dialogue, including a transcript if you uploaded audio."); }
   }
 
   return (
@@ -36,22 +32,7 @@ export default function AddText() {
             <ArrowLeft size={24} />
           </button>
 
-          <div className="flex flex-wrap justify-center gap-5 text-sm font-medium md:gap-10">
-            {["Upload", "Add text", "Voice", "Generate"].map((step, index) => (
-              <div key={step} className="flex items-center gap-2">
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                    index === 1
-                      ? "bg-qool-orange text-white"
-                      : "bg-[#E8E5DF] text-[#777]"
-                  }`}
-                >
-                  {index + 1}
-                </span>
-                <span className="hidden sm:inline">{step}</span>
-              </div>
-            ))}
-          </div>
+          <StepIndicator current={2} />
         </div>
 
         <section className="mx-auto mt-16 max-w-[760px]">
@@ -88,21 +69,22 @@ export default function AddText() {
 
           {mode === "text" ? (
             <div className="mt-8">
-              <label className="mb-3 block font-semibold">
+              <label htmlFor="dialogue" className="mb-3 block font-semibold">
                 Your script
               </label>
 
               <textarea
+                id="dialogue"
                 dir="auto"
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => update({ dialogue: e.target.value })}
                 placeholder="اكتب النص الذي تريد أن تقوله الصورة..."
-                maxLength={1000}
+
                 className="font-arabic min-h-[230px] w-full resize-none rounded-2xl border border-[#DDD8D0] bg-white p-6 text-lg leading-9 outline-none focus:border-qool-orange"
               />
 
               <p className="mt-2 text-right text-sm text-qool-muted">
-                {text.length} / 1000 characters
+                {text.length} characters
               </p>
             </div>
           ) : (
@@ -118,14 +100,14 @@ export default function AddText() {
               </p>
 
               <p className="mt-2 text-sm text-qool-muted">
-                MP3 or WAV audio
+                MP3 or WAV audio. This recording stays in your local draft; Qool cannot transcribe or automatically lip-sync uploaded audio. Enter the exact transcript in Type text before continuing.
               </p>
 
               <input
                 type="file"
                 accept=".mp3,.wav,audio/mpeg,audio/wav"
                 onChange={(e) =>
-                  setAudio(e.target.files?.[0] || null)
+                  update({ audio: e.target.files?.[0] || null })
                 }
                 className="mx-auto mt-6 block max-w-full text-sm"
               />
@@ -138,6 +120,9 @@ export default function AddText() {
             </div>
           )}
 
+          {mode === "audio" && <button className="mt-4 font-semibold text-qool-orange underline" onClick={() => setMode("text")}>Enter the exact transcript</button>}
+          {audio && <div className="mt-4 rounded-2xl bg-qool-peach p-4"><p>Retained recording: <bdi>{audio.name}</bdi>. It is not sent to Google Flow or included in the text download.</p><button className="mt-2 underline" onClick={() => update({ audio: null })}>Remove recording</button></div>}
+          {error && <p role="alert" className="mt-4 text-red-600">{error}</p>}
           <div className="mt-12 flex items-center justify-between">
             <button
               onClick={() => navigate("/upload")}
@@ -149,7 +134,7 @@ export default function AddText() {
             <button
               onClick={next}
               disabled={
-                mode === "text" ? !text.trim() : !audio
+                !text.trim()
               }
               className="flex items-center gap-2 rounded-full bg-qool-orange px-9 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
             >

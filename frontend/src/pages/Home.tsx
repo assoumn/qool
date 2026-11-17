@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Image, FileText, PlaySquare } from "lucide-react";
 import Header from "../components/Header";
 
@@ -11,12 +11,12 @@ const features = [
   {
     icon: FileText,
     title: "Add your text",
-    description: "Type or upload your audio",
+    description: "Write your exact dialogue",
   },
   {
     icon: PlaySquare,
-    title: "Generate video",
-    description: "Get a natural talking video",
+    title: "Generate a Flow prompt",
+    description: "Copy your prompt into Google Flow",
   },
 ];
 
@@ -46,7 +46,7 @@ export default function Home() {
               </h1>
 
               <p className="mt-6 max-w-[400px] text-[17px] font-medium leading-7 text-qool-muted">
-                Turn a portrait into natural, realistic speech in a few seconds.
+                Create a personalized prompt for a talking portrait, then generate your video manually in Google Flow.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
@@ -61,7 +61,7 @@ export default function Home() {
                   href="#examples"
                   className="rounded-full border border-qool-orange px-9 py-3.5 text-sm font-semibold text-qool-orange transition hover:bg-qool-peach"
                 >
-                  Watch demo
+                  See examples
                 </a>
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function Home() {
           </section>
 
           <section id="how-it-works" className="sr-only">
-            Upload a portrait, add text, and generate a talking video.
+            Upload a portrait, add dialogue, choose preferences, and copy your prompt into Google Flow.
           </section>
 
           <section id="examples" className="sr-only">

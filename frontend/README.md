@@ -1,75 +1,36 @@
-# React + TypeScript + Vite
+# Qool — Google Flow prompt generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite. Qool creates prompts locally, without a paid API. Video generation happens manually in [Google Flow](https://labs.google/fx/tools/flow); no video generation, speech synthesis, transcription, or Flow automation is performed by Qool.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From `frontend/`, with Node 24 and npm:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm ci
+npm run dev -- --host 0.0.0.0
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+If the environment restricts writes to the npm cache, use `npm ci --cache /tmp/qool-npm-cache`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm run build
+npm run lint
+node --experimental-strip-types --test tests/flowPrompt.test.ts
 ```
+
+## Workflow
+
+Home → Upload Portrait → Add Text → Voice Selection → Generate Flow Prompt → Prompt Ready.
+
+Upload a readable JPG/JPEG or PNG (maximum 10 MB), or select an existing example. Enter the exact dialogue, including Arabic/English/French code-switching. Choose language, accent, descriptive voice preference, speaking style and speed. Review the short-clip duration warning, then generate, copy, or download the UTF-8 prompt. Open Flow, upload the same portrait, choose an available model, paste the prompt, generate, and download the video there. Voice matching and lip synchronization depend on Flow and are not guaranteed.
+
+Drafts, including uploaded images and optional audio, are saved locally in IndexedDB and restored on refresh in the same browser/origin. No uploads are sent to a server. If storage is unavailable, a notice explains that the in-memory draft may be lost on refresh. Start a new prompt clears the draft after confirmation. Browser data clearing removes saved drafts.
+
+Audio is retained as an optional local reference and explicitly excluded from the prompt/download. Enter the recording's exact transcript in the text tab; Qool does not transcribe or automatically lip-sync audio.
+
+`/prompt-ready` is the result route; `/video-ready` remains compatible with existing links. Direct access to later steps redirects to the first missing prerequisite.
+
+## Manual browser checks
+
+Exercise the complete workflow with both an example and an uploaded portrait. Try invalid MIME types, a corrupt PNG, and files over 10 MB. Verify mixed-language dialogue (including newlines/spaces) is unchanged, preferences affect the prompt, a long script shows a warning, and retained audio remains visible after navigation and refresh. Copy and compare clipboard content; deny clipboard access and check the fallback message. Download the text and compare its content. Verify the Flow link opens a separate tab at the official URL. Check back navigation, refresh, missing prerequisites, and 375px mobile layouts.
