@@ -29,3 +29,34 @@ test('explicitly explains audio is not attached and uses official Flow destinati
   assert.ok(generateFlowPrompt({ ...draft, audio }).includes('not attached to this prompt'));
   assert.equal(FLOW_URL, 'https://labs.google/fx/tools/flow');
 });
+
+test('Lebanese prompts include spoken-dialect guidance and the requested mneh cue without changing dialogue', () => {
+  const exact = "  صباحو guys! كيفكن اليوم مناح؟ عندي surprise كتير حلوة إلكن. C'est incroyable!\n";
+  const prompt = generateFlowPrompt({ ...draft, dialogue: exact });
+  assert.ok(prompt.includes('everyday spoken Lebanese'));
+  assert.ok(prompt.includes('Do not add formal case endings'));
+  assert.ok(prompt.includes('"mneh" (mneḥ)'));
+  assert.ok(prompt.includes('NOT "mnah"'));
+  assert.ok(prompt.includes(`--- BEGIN EXACT DIALOGUE ---\n${exact}\n--- END EXACT DIALOGUE ---`));
+  assert.ok(prompt.indexOf('PRONUNCIATION DIRECTION') < prompt.indexOf('--- BEGIN EXACT DIALOGUE ---'));
+});
+test('word cues match complete Arabic words, including diacritics, but do not leak into unrelated dialogue', () => {
+  assert.ok(generateFlowPrompt({ ...draft, dialogue: 'كيفكن، مْناح؟' }).includes('Requested pronunciation for مناح'));
+  for (const dialogue of ['مرحبا!', 'مناحي', 'المناح']) assert.ok(!generateFlowPrompt({ ...draft, dialogue }).includes('Requested pronunciation for مناح'));
+});
+test('other accents do not receive Lebanese guidance, but mixed languages with a Lebanese accent do', () => {
+  const other = generateFlowPrompt({ ...draft, language: 'Modern Standard Arabic', accent: 'Modern Standard Arabic', dialogue: 'مناح' });
+  assert.ok(!other.includes('PRONUNCIATION DIRECTION'));
+  const mixed = generateFlowPrompt({ ...draft, language: 'Mixed languages', accent: 'Lebanese', dialogue: 'مناح guys?' });
+  assert.ok(mixed.includes('"mneh" (mneḥ)'));
+});
+test('custom pronunciation notes take priority, stay outside dialogue and work with older saved drafts', () => {
+  const prompt = generateFlowPrompt({ ...draft, pronunciationNotes: 'surprise: use French pronunciation.' });
+  assert.ok(prompt.includes('take priority over general pronunciation cues'));
+  assert.ok(prompt.includes('surprise: use French pronunciation.'));
+  assert.ok(!prompt.split('--- BEGIN EXACT DIALOGUE ---')[1].split('--- END EXACT DIALOGUE ---')[0].includes('use French pronunciation'));
+  assert.doesNotThrow(() => generateFlowPrompt({ ...draft, pronunciationNotes: undefined }));
+  const french = generateFlowPrompt({ ...draft, language: 'French', accent: 'Parisian', pronunciationNotes: 'Qool = cool' });
+  assert.ok(french.includes('Qool = cool'));
+  assert.ok(!french.includes('everyday spoken Lebanese'));
+});

@@ -53,6 +53,11 @@ export default function Voice() {
               {['slow', 'normal', 'fast'].map(value => <option key={value}>{value}</option>)}
             </select></div>
           </div>
+          <div className="mt-6">
+            <label htmlFor="pronunciation-notes" className="font-semibold">Pronunciation notes (optional)</label>
+            <p id="pronunciation-help" className="mt-2 text-sm text-qool-muted">Describe how you want particular words to sound. Lebanese prompts automatically include spoken-dialect guidance and “مناح → mneh” when that word appears. You can override this here. These cues can help, but cannot guarantee the model’s accent.</p>
+            <textarea id="pronunciation-notes" aria-describedby="pronunciation-help" dir="auto" maxLength={2000} value={data.pronunciationNotes || ''} onChange={e => update({ pronunciationNotes: e.target.value })} placeholder="For example: مناح = mneh, with an eh vowel and a final ح sound" className="mt-3 min-h-28 w-full rounded-xl border border-[#DDD8D0] bg-white p-3 leading-7" />
+          </div>
           <div className="mt-10 space-y-5">
             {voices.map((voice) => (
               <button

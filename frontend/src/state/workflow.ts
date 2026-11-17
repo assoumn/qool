@@ -6,6 +6,7 @@ export interface Workflow {
   dialogue: string;
   language: string;
   accent: string;
+  pronunciationNotes: string;
   voice: string;
   style: string;
   speed: string;
@@ -13,7 +14,7 @@ export interface Workflow {
 }
 export const defaults: Workflow = {
   portrait: '', portraitName: '', dialogue: '', language: 'Lebanese Arabic',
-  accent: 'Lebanese', voice: 'Warm & natural', style: 'natural', speed: 'normal', audio: null,
+  accent: 'Lebanese', pronunciationNotes: '', voice: 'Warm & natural', style: 'natural', speed: 'normal', audio: null,
 };
 export const WorkflowContext = createContext<{
   data: Workflow;

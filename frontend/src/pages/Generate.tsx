@@ -25,6 +25,7 @@ export default function Generate() {
               <p className="mt-6">{data.language} · {data.accent}<br />{data.voice} · {data.style} · {data.speed}</p>
             </div>
           </div>
+          {data.pronunciationNotes && <div className="mt-5"><h3 className="font-semibold">Pronunciation notes</h3><p dir="auto" className="mt-2 whitespace-pre-wrap break-words">{data.pronunciationNotes}</p></div>}
           {data.audio && <p className="mt-5">Retained audio: <bdi>{data.audio.name}</bdi>. Not attached to the prompt; automatic audio lip-sync is unavailable.</p>}
         </div>
         {seconds > 8 && <p role="status" className="mt-5 rounded-2xl bg-qool-peach p-5">This dialogue may be too long for a short video (roughly {seconds} seconds at your selected speed). Model limits vary; consider separate clips or shorten your dialogue yourself.</p>}

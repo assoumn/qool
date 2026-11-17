@@ -38,3 +38,7 @@ Exercise the complete workflow with both an example and an uploaded portrait. Tr
 ## Optional built-in Veo video generation
 
 A local Vertex AI backend is available in [`../backend`](../backend/README.md). Follow its Windows setup instructions to configure your own authorized Google project, ADC credentials, quota, and credits/billing. Start backend and frontend in separate terminals. Generation is disabled by default and requires an explicit cost/data acknowledgment in Qool; it is not a free Google Flow API. The Generate page supports real job polling, a returned video player, and MP4 download while preserving the original prompt-only route. No live generation is verified until your project is configured and a real request succeeds.
+
+## Pronunciation preferences
+
+Lebanese Arabic prompts include conversational Lebanese delivery and code-switching guidance. When the exact word `مناح` appears, the prompt requests the user’s preferred “mneh” pronunciation (with a final ح), rather than “mnah.” Detection tolerates Arabic vowel marks without changing the dialogue. Voice Selection includes optional pronunciation notes for additional words or to override the default cue. Notes persist with the draft and are included in both Flow and Veo prompts, outside the exact spoken dialogue. Pronunciation cues improve direction but cannot guarantee the model’s output; regional and speaker preferences vary.
